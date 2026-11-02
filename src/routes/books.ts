@@ -26,11 +26,12 @@ bookRouter.get('/', mineAuth, async (req, res) => {
   }
 });
 bookRouter.get('/:id', async (req, res) => {
-  if (!ObjectId.isValid(req.params.id))
+  const bookId = req.params.id;
+  if (typeof bookId !== 'string' || !ObjectId.isValid(bookId))
     return res.status(400).json({ message: 'Invalid book id' });
   const book = await getDB()
     .collection('books')
-    .findOne({ _id: new ObjectId(req.params.id) });
+    .findOne({ _id: new ObjectId(bookId) });
   if (!book) return res.status(404).json({ message: 'Book not found' });
   res.json({ book });
 });
@@ -82,10 +83,11 @@ bookRouter.post('/', requireAuth, async (req, res) => {
     });
 });
 bookRouter.patch('/:id', requireAuth, async (req, res) => {
-  if (!ObjectId.isValid(req.params.id))
+  const bookId = req.params.id;
+  if (typeof bookId !== 'string' || !ObjectId.isValid(bookId))
     return res.status(400).json({ message: 'Invalid book id' });
   const db = getDB(),
-    id = new ObjectId(req.params.id),
+    id = new ObjectId(bookId),
     old = await db.collection('books').findOne({ _id: id });
   if (!old) return res.status(404).json({ message: 'Book not found' });
   if (old.addedByEmail !== req.user!.email)
@@ -120,10 +122,11 @@ bookRouter.patch('/:id', requireAuth, async (req, res) => {
   res.json({ message: 'Book updated' });
 });
 bookRouter.delete('/:id', requireAuth, async (req, res) => {
-  if (!ObjectId.isValid(req.params.id))
+  const bookId = req.params.id;
+  if (typeof bookId !== 'string' || !ObjectId.isValid(bookId))
     return res.status(400).json({ message: 'Invalid book id' });
   const db = getDB(),
-    id = new ObjectId(req.params.id),
+    id = new ObjectId(bookId),
     book = await db.collection('books').findOne({ _id: id });
   if (!book) return res.status(404).json({ message: 'Book not found' });
   if (book.addedByEmail !== req.user!.email)
